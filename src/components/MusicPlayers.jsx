@@ -16,11 +16,7 @@ const MusicPlayers = ({ elem, viewMode = "card", index = 1 }) => {
 
   const handlePlayClick = (e) => {
     e.stopPropagation();
-    if (!isLoggedIn) {
-      navigate('/login');
-    } else {
-      dispatch(playSong(elem));
-    }
+    dispatch(playSong(elem));
   };
 
   // Row / List View (Spotify Tracklist format)

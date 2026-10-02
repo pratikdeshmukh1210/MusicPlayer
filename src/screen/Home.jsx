@@ -65,11 +65,7 @@ const Home = () => {
   );
 
   const handleQuickPlay = (song) => {
-    if (!isLoggedIn) {
-      navigate('/login');
-    } else {
-      dispatch(playSong(song));
-    }
+    dispatch(playSong(song));
   };
 
   return (

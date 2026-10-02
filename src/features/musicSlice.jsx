@@ -1,24 +1,50 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { songsData } from "../data/songs";
+import { api } from "../services/api";
+
+// Async thunk to toggle like in database
+export const toggleLikeSongAsync = createAsyncThunk(
+  "music/toggleLikeSongAsync",
+  async (songId, { rejectWithValue }) => {
+    try {
+      const data = await api.toggleLike(songId);
+      return data.likedSongs;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+// Async thunk to fetch liked songs from database
+export const fetchLikedSongsAsync = createAsyncThunk(
+  "music/fetchLikedSongsAsync",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await api.getLikedSongs();
+      return data.likedSongs;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
 
 const musicSlice = createSlice({
   name: "music",
   initialState: {
-    currentMusic: songsData[0], // default to first track so player is ready
+    currentMusic: songsData[0], // default to first track
     isPlaying: false,
     playlist: songsData,
     currentIndex: 0,
     volume: 0.8,
     isMuted: false,
     isShuffle: false,
-    isRepeat: false, // false | true (single loop)
+    isRepeat: false,
     currentTime: 0,
     duration: 0,
-    likedSongs: [1, 3, 6, 11], // default sample liked song IDs
+    likedSongs: [1, 3, 6, 11],
   },
   reducers: {
     playSong: (state, action) => {
-      // Toggle same song OR play a new one
       if (state.isPlaying && state.currentMusic?.id === action.payload.id) {
         state.isPlaying = false;
       } else {
@@ -107,7 +133,24 @@ const musicSlice = createSlice({
       } else {
         state.likedSongs.push(songId);
       }
-    }
+    },
+
+    setLikedSongsList: (state, action) => {
+      state.likedSongs = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(toggleLikeSongAsync.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.likedSongs = action.payload;
+        }
+      })
+      .addCase(fetchLikedSongsAsync.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.likedSongs = action.payload;
+        }
+      });
   },
 });
 
@@ -123,7 +166,8 @@ export const {
   setPlaylist,
   setCurrentTime,
   setDuration,
-  toggleLikeSong
+  toggleLikeSong,
+  setLikedSongsList
 } = musicSlice.actions;
 
 export default musicSlice.reducer;

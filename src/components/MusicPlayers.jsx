@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { playSong, toggleLikeSong } from '../features/musicSlice';
+import { playSong, toggleLikeSong, toggleLikeSongAsync } from '../features/musicSlice';
 import { useNavigate } from 'react-router-dom';
 import { FaPlay, FaPause, FaHeart, FaRegHeart } from 'react-icons/fa6';
 
@@ -86,6 +86,9 @@ const MusicPlayers = ({ elem, viewMode = "card", index = 1 }) => {
             onClick={(e) => {
               e.stopPropagation();
               dispatch(toggleLikeSong(elem.id));
+              if (isLoggedIn) {
+                dispatch(toggleLikeSongAsync(elem.id));
+              }
             }}
             className="opacity-0 group-hover:opacity-100 transition-opacity p-1 cursor-pointer"
           >
@@ -164,6 +167,9 @@ const MusicPlayers = ({ elem, viewMode = "card", index = 1 }) => {
           onClick={(e) => {
             e.stopPropagation();
             dispatch(toggleLikeSong(elem.id));
+            if (isLoggedIn) {
+              dispatch(toggleLikeSongAsync(elem.id));
+            }
           }}
           className="p-1 text-[#b3b3b3] hover:text-white transition-colors cursor-pointer"
         >

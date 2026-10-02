@@ -10,7 +10,8 @@ import {
   toggleRepeat,
   setCurrentTime,
   setDuration,
-  toggleLikeSong
+  toggleLikeSong,
+  toggleLikeSongAsync
 } from '../features/musicSlice';
 import {
   FaPlay,
@@ -174,7 +175,12 @@ const Player = () => {
           </div>
 
           <button
-            onClick={() => dispatch(toggleLikeSong(currentMusic.id))}
+            onClick={() => {
+              dispatch(toggleLikeSong(currentMusic.id));
+              if (localStorage.getItem('token')) {
+                dispatch(toggleLikeSongAsync(currentMusic.id));
+              }
+            }}
             className="text-[#b3b3b3] hover:text-white transition-colors p-1 flex-shrink-0 cursor-pointer"
             title={isLiked ? "Remove from Liked Songs" : "Save to Liked Songs"}
           >

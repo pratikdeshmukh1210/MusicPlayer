@@ -1,6 +1,7 @@
 services:
+  # Frontend Static Site
   - type: web
-    name: spotify-music-player
+    name: spotify-music-player-frontend
     env: static
     buildCommand: npm run build
     staticPublishPath: dist
@@ -8,3 +9,25 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: spotify-music-player-backend
+          property: host
+          path: /api
+
+  # Backend API & Database Service
+  - type: web
+    name: spotify-music-player-backend
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true

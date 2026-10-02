@@ -1,0 +1,39 @@
+import mongoose from 'mongoose';
+
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 4,
+  },
+  likedSongs: {
+    type: [Number],
+    default: [1, 3, 6, 11],
+  },
+  playlists: [
+    {
+      id: String,
+      name: String,
+      songIds: [Number],
+      createdAt: { type: Date, default: Date.now },
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+export default mongoose.models.User || mongoose.model('User', userSchema);

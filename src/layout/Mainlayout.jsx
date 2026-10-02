@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../features/authSlice';
+import { logout, fetchCurrentUser } from '../features/authSlice';
+import { fetchLikedSongsAsync } from '../features/musicSlice';
 import Player from '../components/Player';
 import {
   FaSpotify,
@@ -24,6 +25,13 @@ const Mainlayout = () => {
   const location = useLocation();
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      dispatch(fetchCurrentUser());
+      dispatch(fetchLikedSongsAsync());
+    }
+  }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logout());

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { register } from '../features/authSlice';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser, clearAuthError } from '../features/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
-import { FaSpotify } from 'react-icons/fa6';
+import { FaSpotify, FaCircleNotch, FaCircleExclamation } from 'react-icons/fa6';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -10,14 +10,22 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isLoggedIn, loading, error } = useSelector((state) => state.auth);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    dispatch(clearAuthError());
+    if (isLoggedIn) {
+      navigate('/');
+    }
+  }, [isLoggedIn, navigate, dispatch]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (name && email && password) {
-      dispatch(register({ name, email }));
-      navigate('/');
-    } else {
-      alert("Please fill in all fields");
+      const result = await dispatch(registerUser({ name, email, password }));
+      if (registerUser.fulfilled.match(result)) {
+        navigate('/');
+      }
     }
   };
 
@@ -31,9 +39,17 @@ const Register = () => {
             Sign up to start listening
           </h1>
           <p className="text-xs text-[#b3b3b3] mt-1">
-            Free on Spotify. No credit card needed.
+            Free on Spotify. User accounts saved to Database.
           </p>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-950/80 border border-red-500/50 rounded-lg flex items-center gap-2.5 text-red-200 text-xs animate-shake">
+            <FaCircleExclamation className="text-red-400 text-base flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -83,9 +99,17 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#1ed760] hover:bg-[#1fdf64] hover:scale-[1.02] active:scale-[0.98] text-black font-extrabold py-3.5 px-6 rounded-full text-sm uppercase tracking-wider transition-all duration-200 mt-6 shadow-lg shadow-[#1ed760]/20 cursor-pointer"
+            disabled={loading}
+            className="w-full bg-[#1ed760] hover:bg-[#1fdf64] hover:scale-[1.02] active:scale-[0.98] text-black font-extrabold py-3.5 px-6 rounded-full text-sm uppercase tracking-wider transition-all duration-200 mt-6 shadow-lg shadow-[#1ed760]/20 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Sign Up
+            {loading ? (
+              <>
+                <FaCircleNotch className="animate-spin text-lg" />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <span>Sign Up</span>
+            )}
           </button>
         </form>
 

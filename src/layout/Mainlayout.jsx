@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout, fetchCurrentUser } from '../features/authSlice';
-import { fetchLikedSongsAsync } from '../features/musicSlice';
 import Player from '../components/Player';
 import {
   FaSpotify,
@@ -10,7 +7,6 @@ import {
   FaMagnifyingGlass,
   FaLinesLeaning,
   FaHeart,
-  FaRightFromBracket,
   FaUser,
   FaFire,
   FaCompactDisc,
@@ -20,23 +16,9 @@ import {
 } from 'react-icons/fa6';
 
 const Mainlayout = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn, user } = useSelector((state) => state.auth);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem('token')) {
-      dispatch(fetchCurrentUser());
-      dispatch(fetchLikedSongsAsync());
-    }
-  }, [dispatch]);
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -193,56 +175,17 @@ const Mainlayout = () => {
             </div>
           </div>
 
-          {/* User Auth Footer Panel */}
+          {/* User Panel */}
           <div className="bg-[#181818] p-3.5 rounded-lg border border-[#282828]">
-            {isLoggedIn ? (
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#1ed760] text-black font-bold flex items-center justify-center text-sm shadow-md">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : <FaUser />}
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs text-[#1ed760] font-semibold">Premium Active</span>
-                    <span className="text-sm font-bold text-white truncate">
-                      {user?.name || user?.email || "Music Lover"}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center justify-center gap-2 bg-[#282828] hover:bg-[#333333] text-white hover:text-red-400 px-3 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer w-full"
-                >
-                  <FaRightFromBracket />
-                  <span>Log out</span>
-                </button>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#1ed760] text-black font-bold flex items-center justify-center text-sm shadow-md">
+                <FaUser />
               </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <p className="text-xs text-[#b3b3b3] leading-tight">
-                  Sign in to play and explore unlimited music tracks.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      navigate('/login');
-                      setMobileSidebarOpen(false);
-                    }}
-                    className="flex-1 bg-white hover:bg-gray-200 text-black font-bold py-2 px-3 rounded-full text-xs transition-all cursor-pointer text-center"
-                  >
-                    Log in
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate('/register');
-                      setMobileSidebarOpen(false);
-                    }}
-                    className="flex-1 bg-transparent hover:bg-[#282828] text-white font-bold py-2 px-3 rounded-full text-xs border border-[#555] transition-all cursor-pointer text-center"
-                  >
-                    Sign up
-                  </button>
-                </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs text-[#1ed760] font-semibold">Listening as</span>
+                <span className="text-sm font-bold text-white truncate">Guest</span>
               </div>
-            )}
+            </div>
           </div>
         </aside>
 
